@@ -1,6 +1,6 @@
 {
   "name": "poc-adventure-in-deck",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -11,7 +11,7 @@
     "url": "git+https://github.com/kjirou/poc-adventure-in-deck.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "kjirou",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/kjirou/poc-adventure-in-deck/issues"
