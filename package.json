@@ -1,0 +1,25 @@
+{
+  "name": "poc-adventure-in-deck",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "prettier:check": "prettier --check .",
+    "prettier:write": "prettier --write .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kjirou/poc-adventure-in-deck.git"
+  },
+  "keywords": [],
+  "author": "kjirou",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kjirou/poc-adventure-in-deck/issues"
+  },
+  "homepage": "https://github.com/kjirou/poc-adventure-in-deck#readme",
+  "devDependencies": {
+    "prettier": "^3.5.1"
+  }
+}
