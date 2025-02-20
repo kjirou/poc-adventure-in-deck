@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/kjirou/poc-adventure-in-deck/issues"
   },
-  "homepage": "https://github.com/kjirou/poc-adventure-in-deck#readme"
+  "homepage": "https://github.com/kjirou/poc-adventure-in-deck#readme",
+  "devDependencies": {
+    "prettier": "^3.5.1"
+  }
 }
