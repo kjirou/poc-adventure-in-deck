@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/kjirou/poc-adventure-in-deck#readme",
   "devDependencies": {
-    "prettier": "^3.5.1"
+    "prettier": "^3.5.1",
+    "vite": "^6.1.1"
   }
 }
