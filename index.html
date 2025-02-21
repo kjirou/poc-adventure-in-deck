@@ -4,10 +4,111 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PoC: Adventure in a Deck</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+      }
+      .cards {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+      }
+      .cards > .card {
+        display: inline-block;
+        width: 100px;
+        height: 150px;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin: 10px;
+        cursor: pointer;
+        text-align: center;
+        font-size: 0.8em;
+        user-select: none;
+      }
+      .stats {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+      }
+      .stats > li {
+        margin: 0 10px;
+      }
+      .cardStats {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+      }
+      .cardStats > li {
+        margin: 0 10px;
+      }
+      .conceptAndRules {
+        list-style-type: none;
+        padding: 0;
+        margin: 10px 0 0 0;
+        font-size: 0.8em;
+        text-align: center;
+      }
+      .formDisplay {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+      }
+    </style>
   </head>
-
   <body>
     <div id="app"></div>
+    <div>
+      <ul class="cards">
+        <li id="card-0" class="card"></li>
+        <li id="card-1" class="card"></li>
+        <li id="card-2" class="card"></li>
+      </ul>
+    </div>
+    <ul class="stats">
+      <li>Party Force: <span id="partyForce"></span></li>
+      <li>Necessary Progression: <span id="necessaryProgression"></span></li>
+    </ul>
+    <ul class="cardStats">
+      <li>Deck: <span id="deckCount"></span></li>
+      <li>Discards: <span id="discardPileCount"></span></li>
+      <li>Resolved: <span id="resolvedCardPileCount"></span></li>
+    </ul>
+    <ul class="conceptAndRules">
+      <li>Party Force が 0 になる前に Necessary Progression を 0 にする。</li>
+      <li>Necessary Progression は、カードの P の分減少する。</li>
+      <li>
+        enemy の損害は、Party Force が低いほど高く、Alert Level(A)
+        が高いほど高い。
+      </li>
+      <li>trap の損害は一定。</li>
+      <li>
+        手札に enemy が 2 枚以上の時は Alert Level を恒常的に +1、3 枚以上の時は
+        +2。
+      </li>
+      <li>
+        損害を抑えつつ、enemy
+        を有利な状況の時に減らして、山札シャッフル後の危険を減らすのがゲーム性。
+      </li>
+    </ul>
+    <!--
+    <div class="formDisplay">
+      <form id="form">
+        <ul>
+          <li><label>AAA</label><input type="text" id="input" /></li>
+        </ul>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+    -->
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
