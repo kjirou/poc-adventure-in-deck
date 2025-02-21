@@ -30,6 +30,21 @@
         font-size: 0.8em;
         user-select: none;
       }
+      .cards > .card > div {
+        padding: 5px;
+      }
+      .cards > .card > .progression {
+        background-color: #f0f0f0;
+        border-bottom: 1px solid #ccc;
+      }
+      .cards > .card > .content {
+        background-color: #f0f0f0;
+      }
+      .cards > .card > .terrain {
+        color: gray;
+        background-color: #f0f0f0;
+        border-top: 1px solid #ccc;
+      }
       .stats {
         list-style-type: none;
         padding: 0;
@@ -68,9 +83,21 @@
     <div id="app"></div>
     <div>
       <ul class="cards">
-        <li id="card-0" class="card"></li>
-        <li id="card-1" class="card"></li>
-        <li id="card-2" class="card"></li>
+        <li id="card-0" class="card">
+          <div class="progression"></div>
+          <div class="content"></div>
+          <div class="terrain"></div>
+        </li>
+        <li id="card-1" class="card">
+          <div class="progression"></div>
+          <div class="content"></div>
+          <div class="terrain"></div>
+        </li>
+        <li id="card-2" class="card">
+          <div class="progression"></div>
+          <div class="content"></div>
+          <div class="terrain"></div>
+        </li>
       </ul>
     </div>
     <ul class="stats">
