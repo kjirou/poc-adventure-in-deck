@@ -14,7 +14,7 @@ const shuffleArray = (array, getRandom = Math.random) => {
   return copied;
 };
 
-const createCard = (contentKind, terrainKind, progression, options) => {
+const createCard = (id, contentKind, terrainKind, progression, options) => {
   if (!["enemy", "trap", "treasure"].includes(contentKind)) {
     throw new Error("Invalid contentKind");
   }
@@ -35,6 +35,7 @@ const createCard = (contentKind, terrainKind, progression, options) => {
   return {
     alertLevel,
     contentKind,
+    id,
     terrainKind,
     progression,
   };
@@ -71,6 +72,7 @@ const createDeck = ({
   for (let i = 0; i < trapCardCount; i++) {
     trapCards.push(
       createCard(
+        cardIndex,
         "trap",
         cardTerrainList[cardIndex],
         cardProgressionList[cardIndex],
@@ -84,6 +86,7 @@ const createDeck = ({
   for (let i = 0; i < enemyCardCount; i++) {
     enemyCards.push(
       createCard(
+        cardIndex,
         "enemy",
         cardTerrainList[cardIndex],
         cardProgressionList[cardIndex],
@@ -99,6 +102,7 @@ const createDeck = ({
   for (let i = 0; i < treasureCardCount; i++) {
     treasureCards.push(
       createCard(
+        cardIndex,
         "treasure",
         cardTerrainList[cardIndex],
         cardProgressionList[cardIndex],
@@ -112,9 +116,12 @@ const createDeck = ({
 
   // 先頭から sanctumCardCount 枚数のカードを enemy の sanctum カードで上書きする。進行度は維持する。
   for (let i = 0; i < sanctumCardCount; i++) {
-    deck[i] = createCard("enemy", "sanctum", deck[i].progression, {
+    deck[i] = {
+      ...deck[i],
+      contentKind: "enemy",
+      terrainKind: "sanctum",
       alertLevel: 1,
-    });
+    };
   }
 
   return shuffleArray(deck);
@@ -124,15 +131,21 @@ const drawCards = ({ deck, count, discardPile } = params) => {
   let newDeck = deck;
   let newHand = [];
   let newDiscardPile = discardPile;
+  let isShuffled = false;
   for (let i = 0; i < count; i++) {
     if (newDeck.length === 0) {
-      newDeck = shuffleArray(discardPile);
+      if (newDiscardPile.length === 0) {
+        break;
+      }
+      newDeck = shuffleArray(newDiscardPile);
+      isShuffled = true;
       newDiscardPile = [];
     }
-    const card = newDeck.shift();
-    newHand.push(card);
+    const drawnCard = newDeck[0];
+    newDeck = newDeck.slice(1);
+    newHand = [...newHand, drawnCard];
   }
-  return { newDeck, newHand, newDiscardPile };
+  return { newDeck, newHand, newDiscardPile, isShuffled };
 };
 
 const maxPartyForce = 100;
@@ -196,6 +209,7 @@ const renderScreen = ({
   hand,
   discardPile,
   resolvedCardPile,
+  dangerMode,
   partyForce,
   necessaryProgression,
 } = props) => {
@@ -210,6 +224,9 @@ const renderScreen = ({
   );
 
   deckCountCountElement.textContent = deck.length;
+  if (dangerMode) {
+    deckCountCountElement.style.color = "red";
+  }
   discardPileCountElement.textContent = discardPile.length;
   resolvedCardPileCountElement.textContent = resolvedCardPile.length;
   partyForceElement.textContent = partyForce;
@@ -224,15 +241,18 @@ const renderScreen = ({
   for (let i = 0; i < maxHandCount; i++) {
     const card = hand[i];
     const cardElement = document.querySelector(`#card-${i}`);
-    const lines = card
-      ? [
-          `T: ${card.terrainKind}`,
-          `C: ${card.contentKind}`,
-          ...(card.alertLevel !== undefined ? [`A: ${card.alertLevel}`] : []),
-          `P: ${card.progression}`,
-        ]
-      : [];
-    cardElement.innerHTML = lines.join("<br>");
+    const progressionElement = cardElement.querySelector(".progression");
+    const contentElement = cardElement.querySelector(".content");
+    const terrainElement = cardElement.querySelector(".terrain");
+    if (card) {
+      progressionElement.textContent = `+${card.progression}`;
+      contentElement.textContent = `${card.contentKind.toUpperCase()}${card.alertLevel !== undefined ? `: ${card.alertLevel}` : ""}`;
+      terrainElement.textContent = card.terrainKind.toUpperCase();
+    } else {
+      progressionElement.textContent = "";
+      contentElement.textContent = "";
+      terrainElement.textContent = "";
+    }
   }
 };
 
@@ -244,6 +264,8 @@ const main = () => {
 
   let partyForce = 100;
   let necessaryProgression = 50;
+  // 一度山札をシャッフルした後 true になり、以降は敵カードが2枚以上だと警戒度増加
+  let dangerMode = false;
 
   let deck = createDeck({
     enemyCardCount,
@@ -251,26 +273,29 @@ const main = () => {
     trapCardCount,
     treasureCardCount,
   });
-  let hand = [deck[0], deck[1], deck[2]];
+  let hand = [];
   let discardPile = [];
   let resolvedCardPile = [];
 
-  const { newDeck, newHand, newDiscardPile } = drawCards({
-    deck,
-    count: maxHandCount,
-    discardPile,
-  });
-  deck = newDeck;
-  hand = newHand;
-  discardPile = newDiscardPile;
-  renderScreen({
-    deck,
-    hand,
-    discardPile,
-    resolvedCardPile,
-    partyForce,
-    necessaryProgression,
-  });
+  (() => {
+    const { newDeck, newHand, newDiscardPile } = drawCards({
+      deck,
+      count: maxHandCount,
+      discardPile,
+    });
+    deck = newDeck;
+    hand = newHand;
+    discardPile = newDiscardPile;
+    renderScreen({
+      deck,
+      hand,
+      discardPile,
+      resolvedCardPile,
+      dangerMode,
+      partyForce,
+      necessaryProgression,
+    });
+  })();
 
   // 手札へイベントハンドラ設定
   for (let i = 0; i < maxHandCount; i++) {
@@ -278,6 +303,9 @@ const main = () => {
     cardElement.addEventListener("click", () => {
       // ゲームの計算
       const selectedCard = hand[i];
+      if (!selectedCard) {
+        return;
+      }
       const { newNecessaryProgression, newPartyForce } = progress({
         partyForce,
         selectedCard,
@@ -286,36 +314,36 @@ const main = () => {
       necessaryProgression = newNecessaryProgression;
       partyForce = newPartyForce;
 
-      // 手札・デッキ・捨札・解決済みカードの更新
-      hand.forEach((card, index) => {
-        if (index === i) {
-          resolvedCardPile.push(card);
-          return;
-        }
-        discardPile.push(card);
-      });
+      // 手札を解決済みへ移動
+      resolvedCardPile = [...resolvedCardPile, selectedCard];
 
-      const { newDeck, newHand, newDiscardPile } = drawCards({
+      // 他の手札を捨札へ移動
+      discardPile = [
+        ...discardPile,
+        ...hand.filter((card) => card !== selectedCard),
+      ];
+
+      const { newDeck, newHand, newDiscardPile, isShuffled } = drawCards({
         deck,
         count: maxHandCount,
         discardPile,
       });
+      dangerMode = dangerMode || isShuffled;
       deck = newDeck;
-      hand = newHand;
-      hand = enhanceEnemiesOnHand(hand);
+      hand = dangerMode ? enhanceEnemiesOnHand(newHand) : newHand;
       discardPile = newDiscardPile;
       renderScreen({
         deck,
         hand,
         discardPile,
         resolvedCardPile,
+        dangerMode,
         partyForce,
         necessaryProgression,
       });
+      console.log("Deck:", deck);
     });
   }
-
-  console.log("Deck:", deck);
 };
 
 main();
